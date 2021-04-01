@@ -1,0 +1,6 @@
+module Pods_RideyDriver_RideyDriverTests {
+  umbrella header "Pods-RideyDriver-RideyDriverTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
