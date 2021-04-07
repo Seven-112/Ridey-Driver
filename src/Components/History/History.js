@@ -68,6 +68,8 @@ const History = ({ actions, navigation, userTrips, userId }) => {
     return (
         <View style={styles.container} >
             <ScrollView>
+                <View style={{flex:1,backgroundColor:'red'}}>
+              
                 <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={() => { navigation.toggleDrawer() }} style={styles.menuContainer}>
                         <Image resizeMode="contain" source={MenuIcon} style={styles.menu} />
@@ -86,6 +88,7 @@ const History = ({ actions, navigation, userTrips, userId }) => {
                             }
                         </View>
                 <View style={{ height: 350 }} />
+                </View>
             </ScrollView>
 
         </View>

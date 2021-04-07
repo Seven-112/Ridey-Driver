@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.WHITE
     },
     headerContainer: {
-        height: '20%',
+        height: '10%',
         backgroundColor: COLORS.SECONDARY_ORANGE,
         justifyContent: 'center'
     },
