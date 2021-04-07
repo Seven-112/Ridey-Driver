@@ -8,7 +8,12 @@ export const socket = io(`${Constants.URL}`, {
   transports:['websocket'],
   jsonp: false,
 });
-let socketIoMiddleware = createSocketIoMiddleware(socket, "server/");
+socket.connect();
+socket.on('connect',()=>{
+  console.log('connected to Socket Server')
+})
+// let socketIoMiddleware = createSocketIoMiddleware(socket, "server/");
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(reducer,composeEnhancers(applyMiddleware(ReduxThunk, socketIoMiddleware)));
+const store = createStore(reducer,composeEnhancers(applyMiddleware(ReduxThunk)));
+// const store = createStore(reducer,composeEnhancers(applyMiddleware(ReduxThunk, socketIoMiddleware)));
 export default store;
