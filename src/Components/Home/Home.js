@@ -23,43 +23,51 @@ import Constants from "../../Constants/appConstants/Global";
 import { mapStyle } from "../../utils/mapStyle";
  import { socket } from "../../Store/store";
 
+ //requestData
+//  date:`${new Date().getDay()}-${new Date().getMonth()}-${new Date().getFullYear()}`,
+//  userId:user.userId,
+//  user:user,
+//  source:requestData.address.pickup,
+//  destination:requestData.address.destination,
+//  distance:requestData.selected.distance,
+//  status:'Pending'
+
 const RenderRequest = ({
-  item,
+  driverData,
+  requestData,
   actions,
   setLoading,
   vehicle,
   userData,
   setAccepted,
 }) => {
-  item = item ? item : {};
-  if (item) {
-    console.log("item",item.user)
+
     return (
       <View style={styles.bottomRequestView}>
         <View style={styles.topbar} />
         <View style={styles.topContainer}>
           <View style={styles.profileImage}>
-            <Image style={{ width: 50, height: 50 }} source={dummyUser} />
+            <Image style={{ width: 50, height: 50 }} source={requestData.user.profileImg} />
           </View>
           <View style={styles.headingContainer}>
             <View style={styles.headContainer}>
-              <Text style={styles.topHeading}>{item.user.name}</Text>
-              <Text style={styles.topHeading}>{`${item.distance} Km`}</Text>
+              <Text style={styles.topHeading}>{requestData.user.name}</Text>
+              <Text style={styles.topHeading}>{`${requestData.distance} Km`}</Text>
             </View>
             <View style={styles.headContainer}>
-              <Text style={styles.botHeading}>{item.date}</Text>
-              <Text style={styles.botHeading}>{item.status}</Text>
+              <Text style={styles.botHeading}>{requestData.date}</Text>
+              <Text style={styles.botHeading}>{requestData.status}</Text>
             </View>
           </View>
         </View>
         <View style={styles.botRequestContainer}>
           <View style={styles.detailRequestContainer}>
             <Text style={styles.detailHeading}>Source Address</Text>
-            <Text style={styles.detailbotRequest}>{item.source}</Text>
+            <Text style={styles.detailbotRequest}>{requestData.source}</Text>
           </View>
           <View style={styles.detailRequestContainer}>
             <Text style={styles.detailHeading}>Destination Address</Text>
-            <Text style={styles.detailbotRequest}>{item.destination}</Text>
+            <Text style={styles.detailbotRequest}>{requestData.destination}</Text>
           </View>
         </View>
         <View style={styles.botButtonContainer}>
@@ -75,7 +83,7 @@ const RenderRequest = ({
                 vehicle,
                 setLoading,
                 setAccepted,
-                item
+                requestData
               )
             }
           >
@@ -84,7 +92,6 @@ const RenderRequest = ({
         </View>
       </View>
     );
-  }
 };
 
 const handelOffline = (actions, userData, setLoading, setOnline,setAccepted) => {
@@ -127,12 +134,12 @@ const handleOnline = (
     actions.user
       .actionMakeDriverOnline(data)
       .then(() => {
-        // setLoading(false);
-        // setOnline(true);
-        actions.user.actionGetRequests().then(() => {
-          setLoading(false);
+           setLoading(false);
           setOnline(true);
-        });
+        // actions.user.actionGetRequests().then(() => {
+        //   setLoading(false);
+        //   setOnline(true);
+        // });
       })
       .catch((e) => console.log(e))
       .then(() => {});
@@ -160,11 +167,8 @@ const handleAccepRequest = (
   actions.user
     .actionCreateTrip(data)
     .then(() => {
-      socket.emit("AcceptRequest", data);
-      // setAccepted(true);
-      // setLoading(false);
       actions.user.actionAcceptTrip(data).then(() => {
-        socket.emit("AcceptRequest", data);
+      socket.emit("AcceptRequest", data);
         setLoading(false);
         setAccepted(true);
       });
@@ -176,25 +180,20 @@ const handleAccepRequest = (
 const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
 
   useEffect(() => {
-
       socket.on("IncomingRequest", (incoming) => {
         console.log("incoming data", incoming);
         setRideRequest(incoming);
         console.log(rideRequest);
       });
+      socket.on('roomConnected',(data)=>{
+     
+        navigation.navigate(RouteNames.Tracking, {
+          requestData: requestData,
+          tripData: tripData,
+        });
+     
+      })
     
-    
-  
-    // socket.on("pendingRequest", (socketObj) => {
-    //   console.log("inconming data", socketObj);
-    // });
-    //   socket.on("IncomingRequest", (requestData) => {
-    //     console.log("inconming data", requestData);
-    //     requests = [...requestData]
-    //   });
-    //   socket.on("pendingRequest", (pendingData) => {
-    //     console.log("pending data", pendingData);
-    //   });
   });
 
   Geocoder.init("AIzaSyBTfypSbx_zNMhWSBXMTA2BJBMQO7_9_T8", { language: "en" });
@@ -304,15 +303,19 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
           source={CurrentLocation}
         />
       </TouchableOpacity>
-      {!accepted && online && requestData.length > 0 ? (
-        requestData.map((item)=> <RenderRequest
+      {/* requestData: requestData,
+      userData:user,
+      driverData:driverData */}
+      {!accepted && online && rideRequest  ? (
+       <RenderRequest
         actions={actions}
-        userData={userData}
         vehicle={selectedVehicle}
         setLoading={setLoading}
         setAccepted={setAccepted}
-        item={item}
-      />)
+        userData={rideRequest.userData}
+        driverData={rideRequest.driverData}
+        requestData={rideRequest.requestData}
+      />
        
       ) : accepted && online && requestData.length > 0  ? (
         <View style={styles.bottomView}>
