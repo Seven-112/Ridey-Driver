@@ -28,6 +28,8 @@ export const getUrl = (type) => {
             return url = `${Constants.URL}/trip/acceptTrip`
         case 'getTrip':
             return url = `${Constants.URL}/trip/getTrip/driver`
+        case 'getCurrentTrip':
+                return url = `${Constants.URL}/trip/getTrip/specific`
         case 'completeTrip':
             return url = `${Constants.URL}/trip/completeTrip`
         case 'addCard':

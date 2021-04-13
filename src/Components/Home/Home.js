@@ -7,8 +7,15 @@ import {
   ActivityIndicator,
   Switch,
   Alert,
+  Dimensions,
+  Platform,
 } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+  AnimatedRegion,
+} from "react-native-maps";
+import GeoLocation from "@react-native-community/geolocation";
 import styles from "./Home.styles";
 import COLORS from "../../Constants/Theme/Color";
 import vehicleIcon from "../../assets/images/icons8-car-30.png";
@@ -21,9 +28,11 @@ import MenuIcon from "../../assets/images/menu.png";
 import Geocoder from "react-native-geocoding";
 import Constants from "../../Constants/appConstants/Global";
 import { mapStyle } from "../../utils/mapStyle";
- import { socket } from "../../Store/store";
+import { socket } from "../../Store/store";
+import RouteNames from "../../Navigation/routeNames";
+import useLocation from "../../hooks/UseLocation";
 
- //requestData
+//requestData
 //  date:`${new Date().getDay()}-${new Date().getMonth()}-${new Date().getFullYear()}`,
 //  userId:user.userId,
 //  user:user,
@@ -31,7 +40,10 @@ import { mapStyle } from "../../utils/mapStyle";
 //  destination:requestData.address.destination,
 //  distance:requestData.selected.distance,
 //  status:'Pending'
-
+const screen = Dimensions.get("window");
+const AspectRatio = screen.width / screen.height;
+const latitudeDelta = 0.9222;
+const longitudeDelta = latitudeDelta * AspectRatio;
 const RenderRequest = ({
   driverData,
   requestData,
@@ -40,61 +52,73 @@ const RenderRequest = ({
   vehicle,
   userData,
   setAccepted,
+  location,
 }) => {
-
-    return (
-      <View style={styles.bottomRequestView}>
-        <View style={styles.topbar} />
-        <View style={styles.topContainer}>
-          <View style={styles.profileImage}>
-            <Image style={{ width: 50, height: 50 }} source={requestData.user.profileImg} />
-          </View>
-          <View style={styles.headingContainer}>
-            <View style={styles.headContainer}>
-              <Text style={styles.topHeading}>{requestData.user.name}</Text>
-              <Text style={styles.topHeading}>{`${requestData.distance} Km`}</Text>
-            </View>
-            <View style={styles.headContainer}>
-              <Text style={styles.botHeading}>{requestData.date}</Text>
-              <Text style={styles.botHeading}>{requestData.status}</Text>
-            </View>
-          </View>
+  return (
+    <View style={styles.bottomRequestView}>
+      <View style={styles.topbar} />
+      <View style={styles.topContainer}>
+        <View style={styles.profileImage}>
+          <Image
+            style={{ width: 50, height: 50 }}
+            source={requestData.user.profileImg}
+          />
         </View>
-        <View style={styles.botRequestContainer}>
-          <View style={styles.detailRequestContainer}>
-            <Text style={styles.detailHeading}>Source Address</Text>
-            <Text style={styles.detailbotRequest}>{requestData.source}</Text>
+        <View style={styles.headingContainer}>
+          <View style={styles.headContainer}>
+            <Text style={styles.topHeading}>{requestData.user.name}</Text>
+            <Text
+              style={styles.topHeading}
+            >{`${requestData.distance} Km`}</Text>
           </View>
-          <View style={styles.detailRequestContainer}>
-            <Text style={styles.detailHeading}>Destination Address</Text>
-            <Text style={styles.detailbotRequest}>{requestData.destination}</Text>
+          <View style={styles.headContainer}>
+            <Text style={styles.botHeading}>{requestData.date}</Text>
+            <Text style={styles.botHeading}>{requestData.status}</Text>
           </View>
-        </View>
-        <View style={styles.botButtonContainer}>
-          <TouchableOpacity style={styles.rejectButton} onPress={() => {}}>
-            <Text>Reject</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={() =>
-              handleAccepRequest(
-                actions,
-                userData,
-                vehicle,
-                setLoading,
-                setAccepted,
-                requestData
-              )
-            }
-          >
-            <Text>Accept</Text>
-          </TouchableOpacity>
         </View>
       </View>
-    );
+      <View style={styles.botRequestContainer}>
+        <View style={styles.detailRequestContainer}>
+          <Text style={styles.detailHeading}>Source Address</Text>
+          <Text style={styles.detailbotRequest}>{requestData.source}</Text>
+        </View>
+        <View style={styles.detailRequestContainer}>
+          <Text style={styles.detailHeading}>Destination Address</Text>
+          <Text style={styles.detailbotRequest}>{requestData.destination}</Text>
+        </View>
+      </View>
+      <View style={styles.botButtonContainer}>
+        <TouchableOpacity style={styles.rejectButton} onPress={() => {}}>
+          <Text>Reject</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.acceptButton}
+          onPress={() =>
+            handleAccepRequest(
+              actions,
+              driverData,
+              vehicle,
+              setLoading,
+              setAccepted,
+              requestData,
+              location
+            )
+          }
+        >
+          <Text>Accept</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 
-const handelOffline = (actions, userData, setLoading, setOnline,setAccepted) => {
+const handelOffline = (
+  actions,
+  userData,
+  setLoading,
+  setOnline,
+  setAccepted
+) => {
   const data = {
     driverId: userData.driverId,
   };
@@ -104,7 +128,7 @@ const handelOffline = (actions, userData, setLoading, setOnline,setAccepted) => 
     .then(() => {
       setLoading(false);
       setOnline(false);
-      setAccepted(false)
+      setAccepted(false);
     })
     .catch((e) => console.log(e))
     .then(() => {});
@@ -134,8 +158,8 @@ const handleOnline = (
     actions.user
       .actionMakeDriverOnline(data)
       .then(() => {
-           setLoading(false);
-          setOnline(true);
+        setLoading(false);
+        setOnline(true);
         // actions.user.actionGetRequests().then(() => {
         //   setLoading(false);
         //   setOnline(true);
@@ -145,60 +169,57 @@ const handleOnline = (
       .then(() => {});
   }
 };
-const handleAccepRequest = (
+const handleAccepRequest = async (
   actions,
   driver,
   vehicle,
   setLoading,
   setAccepted,
-  item
+  item,
+  location
 ) => {
-  // actionCreateTrip,
-  // actionAcceptTrip
+  console.log("location", item);
   const data = {
-    driverId: driver.driverId,
+    driverId: driver[0].driverId,
     fare: "33",
     status: "Accepted",
     vehicle: vehicle,
-    driver: driver,
+    driver: driver[0].driver,
     userId: item.userId,
+    driverLat: location.latitude,
+    driverLong: location.longitude,
+    userLat: item.sourcelocation.latitude,
+    userLong: item.sourcelocation.longitude,
   };
+  console.log("trip Accept Data", data);
   setLoading(true);
   actions.user
     .actionCreateTrip(data)
     .then(() => {
-      actions.user.actionAcceptTrip(data).then(() => {
       socket.emit("AcceptRequest", data);
-        setLoading(false);
-        setAccepted(true);
-      });
+      setLoading(false);
+      setAccepted(true);
+      // actions.user.actionAcceptTrip(data).then(() => {
+      // socket.emit("AcceptRequest", data);
+      //   setLoading(false);
+      //   setAccepted(true);
+      // });
     })
     .catch((e) => console.log(e))
     .then(() => {});
 };
 
-const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
-
-  useEffect(() => {
-      socket.on("IncomingRequest", (incoming) => {
-        console.log("incoming data", incoming);
-        setRideRequest(incoming);
-        console.log(rideRequest);
-      });
-      socket.on('roomConnected',(data)=>{
-     
-        navigation.navigate(RouteNames.Tracking, {
-          requestData: requestData,
-          tripData: tripData,
-        });
-     
-      })
-    
-  });
-
+const Home = ({
+  navigation,
+  actions,
+  userData,
+  selectedVehicle,
+  requests,
+  tripData,
+}) => {
   Geocoder.init("AIzaSyBTfypSbx_zNMhWSBXMTA2BJBMQO7_9_T8", { language: "en" });
   const requestData = requests ? requests : [];
-  console.log(requestData)
+  console.log(requestData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [location, setLocation] = useState();
@@ -207,11 +228,12 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
   const [region, setRegion] = useState({
     latitude: 31.481084,
     longitude: 74.311172,
+    latitudeDelta: latitudeDelta,
+    longitudeDelta: longitudeDelta,
   });
-
-
   const [online, setOnline] = useState(false);
   let mapRef = useRef(null);
+  let markerRef = useRef(null);
 
   const onUserLocationChange = async (event) => {
     const { latitude, longitude, heading } = event.nativeEvent.coordinate;
@@ -220,32 +242,85 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
         latitude,
         longitude,
       });
+      setRegion({
+        latitude,
+        longitude,
+        latitudeDelta,
+        longitudeDelta,
+      });
     } catch (e) {
       console.error(e);
     }
   };
 
+  useEffect(() => {
+    socket.on("IncomingRequest", (incoming) => {
+      console.log("incoming data", incoming);
+      setRideRequest(incoming);
+    });
+    socket.on("roomConnected", (data) => {
+      console.log(data);
+      const userInfo = {
+        roomId: data.roomId,
+        userLat: data.tripData.userLat,
+        userLng: data.tripData.userLong,
+      };
+      navigation.navigate(RouteNames.Tracking, {
+        userInfo: userInfo,
+      });
+    });
+  });
+  const handleSuccess = (position) => {
+    const { latitude, longitude } = position.coords;
+    setLocation({
+      latitude: longitude,
+      longitude: longitude,
+    });
+    setRegion({
+      latitude,
+      longitude,
+      latitudeDelta,
+      longitudeDelta,
+    });
+    console.log("location", position.coords);
+
+  };
+
+  const handleError = (error) => {
+    console.log(error)
+    // setLocationError(error.message);
+  };
+  const geolocationOptions = {
+    enableHighAccuracy: true,
+    timeout: 60000, // 1 min (1000 ms * 60 sec * 1 minute = 60 000ms)
+    maximumAge: 1000 * 3600 * 24, // 24 hour
+  };
+
+  useEffect(() => {
+    GeoLocation.getCurrentPosition(
+      handleSuccess,
+      handleError,
+      geolocationOptions
+    );
+  }, []);
+
   return (
     <View style={styles.container}>
       <MapView
         loadingEnabled={true}
-        ref={(mapref) => (mapRef = mapref)}
-        minZoomLevel={16}
-        maxZoomLevel={20}
+        ref={mapRef}
+         minZoomLevel={16}
+        // maxZoomLevel={20}
         onUserLocationChange={onUserLocationChange}
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         showsScale={true}
-        initialRegion={{
-          latitude: location ? location.latitude : region.latitude,
-          longitude: location ? location.longitude : region.longitude,
-          latitudeDelta: 1,
-          longitudeDelta: 1,
-        }}
+        initialRegion={region}
         customMapStyle={mapStyle}
       >
         {!loading && (
-          <Marker
+          <Marker.Animated
+            ref={markerRef}
             coordinate={{
               latitude: region.latitude,
               longitude: region.longitude,
@@ -253,7 +328,7 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
             title="Current Location"
             tracksViewChanges={false}
             icon={MapPin}
-          ></Marker>
+          />
         )}
       </MapView>
       <View style={styles.profileContainer}>
@@ -279,7 +354,14 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
                     online,
                     setLoading
                   )
-              : () => handelOffline(actions, userData, setLoading, setOnline,setAccepted)
+              : () =>
+                  handelOffline(
+                    actions,
+                    userData,
+                    setLoading,
+                    setOnline,
+                    setAccepted
+                  )
           }
           value={online}
         />
@@ -290,7 +372,10 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
         </View>
       )}
       <TouchableOpacity
-        onPress={() => mapRef.animateCamera({ center: region })}
+        onPress={() =>
+          mapRef.current.animateCamera({})
+          // mapRef.current.animateCamera({center:region})
+        }
         style={styles.currentLocation}
       >
         <Image
@@ -306,18 +391,18 @@ const Home = ({ navigation, actions, userData, selectedVehicle, requests }) => {
       {/* requestData: requestData,
       userData:user,
       driverData:driverData */}
-      {!accepted && online && rideRequest  ? (
-       <RenderRequest
-        actions={actions}
-        vehicle={selectedVehicle}
-        setLoading={setLoading}
-        setAccepted={setAccepted}
-        userData={rideRequest.userData}
-        driverData={rideRequest.driverData}
-        requestData={rideRequest.requestData}
-      />
-       
-      ) : accepted && online && requestData.length > 0  ? (
+      {!accepted && online && rideRequest ? (
+        <RenderRequest
+          actions={actions}
+          vehicle={selectedVehicle}
+          setLoading={setLoading}
+          setAccepted={setAccepted}
+          userData={rideRequest.userData}
+          driverData={rideRequest.driverData}
+          requestData={rideRequest.requestData}
+          location={location}
+        />
+      ) : accepted && online && rideRequest ? (
         <View style={styles.bottomView}>
           <View style={styles.topbar} />
           <View style={styles.topContainer}>

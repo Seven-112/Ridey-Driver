@@ -3,26 +3,32 @@ import Tracking from '../Components/Tracking';
 import { useDispatch, useSelector } from 'react-redux';
 import * as userSelectors from '../Store/Selectors/';
 import STORE from '../Store';
+import * as Actions from '../Store/Actions';
 
 
 
 
 const TrackingScreen = (props) => {
-    const requestData = props.route.params.requestData;
-    const tripData = props.route.params.tripData;
+    const dispatch = useDispatch();
+    const userInfo = props.route.params.userInfo;
+    const tripData = useSelector(userSelectors.getTripData);
     const requestError = useSelector(userSelectors.getRequestErrors);
     const requestStatus = useSelector(userSelectors.getRequestStatus);
     const nearByDrivers = useSelector(userSelectors.getNearByDriverData);
     const user = useSelector(userSelectors.getLoginData);
+    const getCurrentTrip = (data)=>dispatch(Actions.actionGetCurrentTrip(data))
     const enhancedProps = {
+        actions:{
+            getCurrentTrip
+        },
         ...props,
         requestError,
         requestStatus,
-        requestData,
         tripData,
         user,
         navigation: props.navigation,
-        nearByDrivers
+        nearByDrivers,
+        userInfo
     }
     return <Tracking {...enhancedProps} />
 }

@@ -1,6 +1,6 @@
 import { getErrors, getLoginData, getStatus, getUserId, getUploadData, getUploadStatus } from './authSelectors';
 import { getRequestData, getRequestErrors, getRequestStatus, getNearByDriverData } from './requestSelectors';
-import { getTripData, getTripStatus, getTripErrors } from './tripSelectors';
+import { getTripData, getTripStatus, getTripErrors,getCurrentTrip } from './tripSelectors';
 import { getPaymentErrors, getPaymentData, getPaymentStatus, getTransactionData, getUserTransactions } from './paymentSelectors';
 import { getSpecificVehicle, getVehicleData, getVehicleErrors, getVehicleStatus,getSelectedVehicle } from './vehicleSelectors';
 export {
@@ -26,5 +26,6 @@ export {
     getPaymentStatus,
     getPaymentData,
     getTransactionData,
-    getUserTransactions
+    getUserTransactions,
+    getCurrentTrip,
 }

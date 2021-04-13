@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         borderColor: COLORS.TRANSPARENT,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 5
+        marginRight: 15
     },
     divider: {
         borderBottomWidth: 1,

@@ -11,10 +11,11 @@ const HomeScreen = (props) => {
     const actionChangeStatus = (data) => dispatch(STORE.actions.ActionClearPaymentError(data));
     const actionMakeDriverOnline = (data) => dispatch(STORE.actions.actionMakeOnlineDriver(data));
     const actionMakeDriverOffline= (data)=>dispatch(STORE.actions.actionMakeOfflineDriver(data));
-    const actionGetRequests = ()=>dispatch(STORE.actions.actionGetAllRequest())
+    const actionGetRequests = ()=>dispatch(STORE.actions.actionGetAllRequest());
     const userData = useSelector(Selectors.getLoginData);
     const selectedVehicle = useSelector(Selectors.getSelectedVehicle);
     const requests = useSelector(Selectors.getRequestData);
+    const tripData = useSelector(Selectors.getTripData)
     console.log('req',requests)
     const enhancedProps = {
         actions: {
@@ -30,7 +31,8 @@ const HomeScreen = (props) => {
         userData,
         navigation: props.navigation,
         selectedVehicle,
-        requests
+        requests,
+        tripData
     }
 
     return <Home {...enhancedProps} />

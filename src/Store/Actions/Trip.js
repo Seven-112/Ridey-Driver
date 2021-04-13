@@ -4,6 +4,7 @@ export const ACCEPT_TRIP = 'ACCEPT_TRIP';
 export const GET_TRIP = 'GET_TRIP';
 export const CLEAR_TRIP_ERROR = 'CLEAR_TRIP_ERROR';
 export const TRIP_COMPLETE = 'TRIP_COMPLETE';
+export const GET_CURRENT_TRIP  = 'GET_CURRENT_TRIP';
 
 
 
@@ -42,6 +43,17 @@ export const actionCompleteTrip = (data) => {
     }
 }
 
+export const actionGetCurrentTrip = (data) => {
+    return async dispatch => {
+        const response = await actions.createNetworkRequest('POST', 'getCurrentTrip', data);
+        dispatch({ 
+            type: GET_CURRENT_TRIP,
+            data:response.data,
+            error:response.message,
+            success:response.success 
+        })
+    }
+}
 
 export const actionGetUserTrip = (data) => {
     return async dispatch => {
