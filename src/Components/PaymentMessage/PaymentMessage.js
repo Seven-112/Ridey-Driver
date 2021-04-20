@@ -9,11 +9,11 @@ const PaymentMessage = ({ navigation,tripData }) => {
     return (
         <View style={styles.container}>
             <View style={styles.contentContainer}>
-                <Text style={styles.headerText}>PAY AMOUNT</Text>
+                <Text style={styles.headerText}>RECEIVE AMOUNT</Text>
                 <View style={styles.amountContainer}>
                     <Text style={styles.textAmount}>{tripData.fare} <Text style={{fontSize:20}}>RS</Text></Text>
                 </View>
-                <TouchableOpacity onPress={()=>{navigation.navigate(routeNames.Rating)}} style={styles.buttonContainer}>
+                <TouchableOpacity onPress={()=>{navigation.popToTop()}} style={styles.buttonContainer}>
                     <Text>OK</Text>
                 </TouchableOpacity>
             </View>

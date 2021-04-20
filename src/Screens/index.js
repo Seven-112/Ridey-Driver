@@ -20,10 +20,12 @@ import WalletScreen from './WalletScreen';
 import CallingScreen from './CallingScreen';
 import VehicleScreen from './VehicleScreen';
 import AddVehicleScreen from './AddVehicleScreen';
+import ChatScreen from './ChatScreen';
 
 export {
     AddVehicleScreen,
     CallingScreen,
+    ChatScreen,
     HomeScreen,
     OnBoardingScreen,
     OtpScreen,

@@ -101,6 +101,7 @@ const RenderRequest = ({
               setLoading,
               setAccepted,
               requestData,
+              userData,
               location
             )
           }
@@ -148,8 +149,8 @@ const handleOnline = (
     const data = {
       driverId: userData.driverId,
       vehicleId: selectedVehicle.vehicleId,
-      latitude: "31.4515431",
-      longitude: "74.3949027",
+      latitude: '31.4515431',
+      longitude: '74.3949027',
       location: "test",
       vehicle: selectedVehicle,
       driver: userData,
@@ -176,9 +177,10 @@ const handleAccepRequest = async (
   setLoading,
   setAccepted,
   item,
+  userData,
   location
 ) => {
-  console.log("location", item);
+ 
   const data = {
     driverId: driver[0].driverId,
     fare: "33",
@@ -193,10 +195,12 @@ const handleAccepRequest = async (
   };
   console.log("trip Accept Data", data);
   setLoading(true);
-  actions.user
+  actions.user.actionGetAcceptingRequest({userId:item.userId}).then(()=>{
+    actions.user
     .actionCreateTrip(data)
     .then(() => {
-      socket.emit("AcceptRequest", data);
+      
+      socket.emit("AcceptRequest", {...data,userData,item});
       setLoading(false);
       setAccepted(true);
       // actions.user.actionAcceptTrip(data).then(() => {
@@ -207,6 +211,9 @@ const handleAccepRequest = async (
     })
     .catch((e) => console.log(e))
     .then(() => {});
+  }).catch((e) => console.log(e))
+    .then(() => {});
+
 };
 
 const Home = ({
@@ -265,13 +272,29 @@ const Home = ({
         userLat: data.tripData.userLat,
         userLng: data.tripData.userLong,
       };
+      setRideRequest(null);
+      setAccepted(false);
+      setOnline(false);
       navigation.navigate(RouteNames.Tracking, {
         userInfo: userInfo,
       });
     });
+    return ()=>{
+      socket.off("IncomingRequest")
+    }
   });
   const handleSuccess = (position) => {
     const { latitude, longitude } = position.coords;
+    mapRef.current.animateCamera(
+      {
+        center: {
+          latitude: latitude,
+          longitude: longitude,
+        },
+        zoom: 16,
+      },
+      { duration: 500 }
+    );
     setLocation({
       latitude: longitude,
       longitude: longitude,
@@ -302,6 +325,7 @@ const Home = ({
       handleError,
       geolocationOptions
     );
+  
   }, []);
 
   return (
@@ -317,6 +341,7 @@ const Home = ({
         showsScale={true}
         initialRegion={region}
         customMapStyle={mapStyle}
+        showsUserLocation={true}
       >
         {!loading && (
           <Marker.Animated
@@ -327,8 +352,9 @@ const Home = ({
             }}
             title="Current Location"
             tracksViewChanges={false}
-            icon={MapPin}
-          />
+          >
+            <Image source={MapPin} style={{width:60,height:60}}/>
+          </Marker.Animated>
         )}
       </MapView>
       <View style={styles.profileContainer}>
@@ -406,17 +432,25 @@ const Home = ({
         <View style={styles.bottomView}>
           <View style={styles.topbar} />
           <View style={styles.topContainer}>
+          <View style={styles.profileImage}>
+              <Image style={{ width: 50, height: 50 }} source={dummyUser} />
+            </View>
             <View style={styles.headingContainer}>
               <View style={styles.headContainer}>
                 <Text style={styles.topHeading}>{userData.name}</Text>
-                <Text style={styles.topHeading}>CONNECTING WITH USER</Text>
               </View>
               <View style={styles.headContainer}>
                 <Text style={styles.botHeading}>Basic Level</Text>
-                <Text style={styles.botHeading}>Earned</Text>
               </View>
+            
             </View>
+          
           </View>
+          <View style={styles.headNextContainer}>
+                <Text style={styles.topHeadingUser}>CONNECTING WITH USER</Text>
+                <ActivityIndicator size="large" color={COLORS.SECONDARY_ORANGE
+                }/>
+              </View>
         </View>
       ) : (
         <View style={styles.bottomView}>

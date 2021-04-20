@@ -10,6 +10,7 @@ import * as Actions from '../Store/Actions';
 
 const TrackingScreen = (props) => {
     const dispatch = useDispatch();
+    const acceptingRequestId = useSelector(userSelectors.getAcceptingId);
     const userInfo = props.route.params.userInfo;
     const tripData = useSelector(userSelectors.getTripData);
     const requestError = useSelector(userSelectors.getRequestErrors);
@@ -28,7 +29,8 @@ const TrackingScreen = (props) => {
         user,
         navigation: props.navigation,
         nearByDrivers,
-        userInfo
+        userInfo,
+        acceptingRequestId
     }
     return <Tracking {...enhancedProps} />
 }

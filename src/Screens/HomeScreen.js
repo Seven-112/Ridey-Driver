@@ -3,9 +3,10 @@ import Home from '../Components/Home';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Selectors from '../Store/Selectors';
 import STORE from '../Store'
-
+// getAcceptingId
 const HomeScreen = (props) => {
     const dispatch = useDispatch();
+    const actionGetAcceptingRequest = (data)=>dispatch(STORE.actions.actionGetAcceptingRequest(data))
     const actionCreateTrip = (data) =>dispatch(STORE.actions.actionCreateTrip(data));
     const actionAcceptTrip = (data)=>dispatch(STORE.actions.actionAcceptTrip(data))
     const actionChangeStatus = (data) => dispatch(STORE.actions.ActionClearPaymentError(data));
@@ -25,7 +26,8 @@ const HomeScreen = (props) => {
                 actionMakeDriverOffline,
                 actionGetRequests,
                 actionCreateTrip,
-                actionAcceptTrip
+                actionAcceptTrip,
+                actionGetAcceptingRequest
             }
         },
         userData,

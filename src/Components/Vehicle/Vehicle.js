@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator,Alert } from 'react-native';
 import styles from './Vehicle.styles';
 import MenuIcon from '../../assets/images/menu.png';
 import CarIcon from '../../assets/images/icons8-car-30.png';
@@ -12,7 +12,8 @@ const handleSelectVehicle = (actions, data, setLoading) => {
     actions.user
         .handleSelectVehicle(data)
         .then(() => {
-            setLoading(false)
+            setLoading(false);
+            Alert.alert("Successfull",'Vehicle Selected Successfully',[{text:'OK'}])
         })
         .catch((e) => console.log(e))
         .then(() => { });

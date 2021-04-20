@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput, ActivityIndicator,KeyboardAvoidingView } from 'react-native';
 import styles from './Rating.styles';
 import dummyUser from '../../assets/images/dummyUser.jpg';
 import StarIcon from '../../assets/images/star.png';
@@ -73,6 +73,7 @@ const Rating = ({ actions, tripStatus, tripError, navigation, tripData }) => {
 
     return (
         <View style={styles.container}>
+            <KeyboardAvoidingView behavior="padding">
             <View style={styles.contentContainer}>
                 <View style={styles.imageContainer}>
                     <Image resizeMode="contain" style={styles.image} source={dummyUser} />
@@ -94,6 +95,7 @@ const Rating = ({ actions, tripStatus, tripError, navigation, tripData }) => {
 
                 </TouchableOpacity>
             </View>
+            </KeyboardAvoidingView>
         </View>
     )
 

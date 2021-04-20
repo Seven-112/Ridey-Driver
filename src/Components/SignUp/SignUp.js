@@ -140,7 +140,7 @@ const SignUp = ({ navigation, actions, userError, userStatus, uploadData, upload
 
     return (
         <ScrollView>
-            <KeyboardAvoidingView  keyboardVerticalOffset={80} style={styles.container}>
+            <KeyboardAvoidingView  behavior="padding" keyboardVerticalOffset={80} style={styles.container}>
                 <View style={styles.topContainer}>
                     <Image style={styles.image} resizeMode="contain" source={loginImage} />
                 </View>

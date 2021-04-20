@@ -5,7 +5,7 @@ export const GET_REQUEST = 'GET_REQUEST';
 export const GET_ALL_REQUEST = 'GET_ALL_REQUEST';
 export const CLEAR_REQUEST_ERROR = 'CLEAR_REQUEST_ERROR';
 export const GET_NEARBY_DRIVERS = 'GET_NEARBY_DRIVERS';
-
+export const GET_ACCPEPTNG_ID = 'GET_ACCPEPTNG_ID';
 
 export const actionCreateRequest = (data) => {
     return async dispatch => {
@@ -59,6 +59,18 @@ export const actionGetUserRequest = (data) => {
         console.log(response);
         dispatch({ 
             type: GET_REQUEST,
+            data:response.data[0],
+            error:response.message,
+            success:response.success 
+        })
+    }
+}
+export const actionGetAcceptingRequest = (data) => {
+    return async dispatch => {
+        const response = await actions.createNetworkRequest('POST', 'getAllUserRequest', data);
+        console.log(response);
+        dispatch({ 
+            type: GET_ACCPEPTNG_ID,
             data:response.data[0],
             error:response.message,
             success:response.success 

@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
         borderColor: COLORS.BORDER_GRAY
     },
     topContainer: {
-        // backgroundColor:'red',
         flexDirection: 'row',
         marginHorizontal: 10
     },
@@ -176,10 +175,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
+    headNextContainer: {
+        justifyContent:'space-around',
+        alignItems:'center',
+        marginTop:20,
+        height:'50%'
+    },
     headingContainer: {
         marginHorizontal: 10,
         justifyContent: 'center',
-        width: '82%'
+        width: '82%',
     },
     profileImage: {
         height: 50,
@@ -191,6 +196,11 @@ const styles = StyleSheet.create({
     topHeading: {
         fontSize: 18,
         fontWeight: '600'
+    },
+    topHeadingUser: {
+        fontSize: 25,
+        fontWeight: '700',
+        color:COLORS.SECONDARY_ORANGE
     },
     botHeading: {
         fontSize: 14,

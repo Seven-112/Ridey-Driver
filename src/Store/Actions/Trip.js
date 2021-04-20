@@ -58,6 +58,7 @@ export const actionGetCurrentTrip = (data) => {
 export const actionGetUserTrip = (data) => {
     return async dispatch => {
         const response = await actions.createNetworkRequest('POST', 'getTrip', data);
+        console.log(response)
         dispatch({ 
             type: GET_TRIP,
             data:response.data,

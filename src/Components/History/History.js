@@ -43,32 +43,33 @@ const handleGetUserTrips = (actions, driverId, setLoading) => {
     const data = {
         driverId
     }
-    setLoading(true)
     actions.user
         .getUserTrips(data)
-        .then(() => { })
+        .then(() => { 
+            setLoading(false);
+        })
         .catch((e) => console.log("ERROR", e))
         .then(() => { });
-    setLoading(false);
+
 
 
 }
 
 const History = ({ actions, navigation, userTrips, userId }) => {
 
-    const tripData = userTrips ? userTrips : []
-    const [loading, setLoading] = useState(false);
+    const tripData = userTrips ? userTrips : [];
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
 
         handleGetUserTrips(actions, userId, setLoading)
 
 
-    }, [])
+    },[])
 
     return (
         <View style={styles.container} >
-            <ScrollView>
-                <View style={{flex:1,backgroundColor:'red'}}>
+  
+                <View style={{flex:1}}>
               
                 <View style={styles.headerContainer}>
                     <TouchableOpacity onPress={() => { navigation.toggleDrawer() }} style={styles.menuContainer}>
@@ -78,6 +79,7 @@ const History = ({ actions, navigation, userTrips, userId }) => {
                 </View>
 
                         <View style={styles.contentContainer}>
+                        <ScrollView>
                             {loading ?
                                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                                     <ActivityIndicator size="large" color="orange" />
@@ -86,10 +88,10 @@ const History = ({ actions, navigation, userTrips, userId }) => {
 
                                 tripData.map((item, index) => <HistoryItem key={index} item={item} />)
                             }
+                                        </ScrollView>
                         </View>
-                <View style={{ height: 350 }} />
                 </View>
-            </ScrollView>
+
 
         </View>
     )

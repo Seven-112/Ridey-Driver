@@ -87,12 +87,13 @@ const Wallet = ({ actions, user, userId, navigation, transactionData }) => {
                 </View>
                 <View style={styles.cardContainer}>
                     <Text style={styles.cardContainerText}>Payment History</Text>
+
                     <ScrollView>
                         <View style={styles.walletContainer}>
                             {transactionData ?
                                 transactionData.map((item, index) => <WalletItem key={index} item={item} />)
                                 :
-                                null
+                                <Text style={{alignSelf:'center'}}>No Transactions</Text>
                             }
                         </View>
                     </ScrollView>

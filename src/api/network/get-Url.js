@@ -18,6 +18,8 @@ export const getUrl = (type) => {
             return url = `${Constants.URL}/driver/offline`
         case 'getRequest':
             return url = `${Constants.URL}/request/getRequest`
+        case 'getUserRequest':
+            return url = `${Constants.URL}/request/getRequest/user`
         case 'getAllUserRequest':
             return url = `${Constants.URL}/request/getRequest/user`
         case 'getNearBy':

@@ -8,8 +8,8 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     contentContainer: {
+        marginTop:10,
         flex: 1,
-        marginTop: '-10%'
     },
     divider: {
         height: 1,
@@ -17,16 +17,16 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.WHITE
     },
     headerContainer: {
-        height: '10%',
+        height: '20%',
         backgroundColor: COLORS.SECONDARY_ORANGE,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     headerText: {
         fontSize: 30,
         marginHorizontal: 20,
         fontWeight: '700',
         color: COLORS.SECONDARY_BLACK,
-        marginTop:30
+        marginTop:50
     },
     itemContainer: {
         height: 150,

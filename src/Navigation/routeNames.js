@@ -20,6 +20,7 @@ export default {
     Wallet:'Wallet',
     PaymentMessage:'PaymentMessage',
     Call:'Call',
+    Chat:'Chat',
     Vehicle:'Vehicle'
 }
 
